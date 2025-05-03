@@ -14,6 +14,7 @@ import globalStyles from '../../../app/styles/globalStyles';
 export default function MapPage() {
   const {
     userMarkers,
+    resolvedMarkers,
     userLocationMarker,
     selectedUserMarker,
     selectedMarker,
@@ -58,6 +59,7 @@ export default function MapPage() {
         <MapViewContainer
           initialRegion={initialRegion}
           userMarkers={userMarkers}
+          resolvedMarkers={resolvedMarkers ?? []}
           userLocationMarker={userLocationMarker}
           onMapPress={mapPress}
           onMapLongPress={handleMapLongPress}
@@ -116,6 +118,7 @@ export default function MapPage() {
             description={selectedMarker.description}
           />
         )}
+
       </View>
     </SafeAreaView>
   );

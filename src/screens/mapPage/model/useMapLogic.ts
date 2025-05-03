@@ -5,12 +5,13 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { UserMarker } from '../../../entities/marker/model/userMarker';
-import { markers } from '../../../entities/marker/model/markers';
+import { markers as baseMarkers } from '../../../entities/marker/model/markers';
 
 const USER_MARKERS_KEY = 'USER_MARKERS_KEY';
 const FAVOURITE_MARKERS_KEY = 'FAVOURITE_MARKERS_KEY';
 
 export const useMapLogic = () => {
+  const [resolvedMarkers, setResolvedMarkers] = useState<any[]>([]);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [userLocationMarker, setUserLocationMarker] = useState<{ latitude: number; longitude: number } | null>(null);
   const [userMarkers, setUserMarkers] = useState<UserMarker[]>([]);
@@ -37,15 +38,43 @@ export const useMapLogic = () => {
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
+      if (status !== 'granted') 
+      {
+          console.warn('Разрешение на геолокацию не получено');
+          return;
+      }
 
       const location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+      geocodeMarkers();
     })();
 
     loadUserMarkers();
     loadFavouriteMarkers();
   }, []);
+
+  const geocodeMarkers = async () => {
+    try {
+      const resolved = await Promise.all(
+        baseMarkers.map(async (marker) => {
+          const coords = await Location.geocodeAsync(marker.address);
+          if (!coords || coords.length === 0) {
+            return null;
+          }
+          return {
+            ...marker,
+            latitude: coords[0].latitude,
+            longitude: coords[0].longitude,
+            model: marker.model,
+          };
+        })
+      ); 
+      const filtered = resolved.filter((m): m is typeof resolved[0] => m !== null);
+      setResolvedMarkers(filtered);
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
+  };
 
   const loadUserMarkers = async () => {
     const saved = await AsyncStorage.getItem(USER_MARKERS_KEY);
@@ -130,7 +159,7 @@ export const useMapLogic = () => {
 
   const handleSearch = () => {
     const query = searchMarker.toLowerCase();
-    const foundMarker = markers.find((m) =>
+    const foundMarker = resolvedMarkers.find((m) =>
       m.title.toLowerCase().includes(query)
     );
     const foundUserMarker = userMarkers.find((m) =>
@@ -176,6 +205,7 @@ export const useMapLogic = () => {
     location,
     userLocationMarker,
     userMarkers,
+    resolvedMarkers,
     modalVisible,
     setModalVisible,
     newMarkerCoords,

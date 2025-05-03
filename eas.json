@@ -8,6 +8,16 @@
         "android": {
           "buildType": "apk"
         }
+      },
+      "debug": {
+        "android": {
+          "buildType": "apk"
+        }
+      },
+      "production": {
+        "android": {
+          "buildType": "apk"
+        }
       }
-    }
+  }
 }
