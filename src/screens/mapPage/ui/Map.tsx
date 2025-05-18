@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, TouchableWithoutFeedback  } from 'react-native';
 import { useMapLogic } from '../model/useMapLogic';
 import { SearchBar } from './SearchBar';
 import { SelectedMarkerModal } from './SelectedMarkerModal';
@@ -46,8 +46,15 @@ export default function MapPage() {
     focusOnUser,
   } = useMapLogic();
 
+  const handleDismissMarkerInfo = () => {
+    if (selectedMarker) {
+      setSelectedMarker(null);
+    }
+  };
+
   return (
     <SafeAreaView style={globalStyles.container} edges={['top', 'left', 'right']}>
+      <TouchableWithoutFeedback onPress={handleDismissMarkerInfo}>
       <View style={globalStyles.container}>
         <SearchBar
           searchMarker={searchMarker}
@@ -61,7 +68,6 @@ export default function MapPage() {
           userMarkers={userMarkers}
           resolvedMarkers={resolvedMarkers ?? []}
           userLocationMarker={userLocationMarker}
-          onMapPress={mapPress}
           onMapLongPress={handleMapLongPress}
           onUserMarkerPress={setSelectedUserMarker}
           onSystemMarkerPress={setSelectedMarker}
@@ -120,6 +126,7 @@ export default function MapPage() {
         )}
 
       </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }

@@ -6,6 +6,7 @@ export default {
     slug: "MapMarkers",
     version: "1.0.0",
     newArchEnabled: false,
+    plugins: ["expo-asset"],
     android: {
       config: {
         googleMaps: {

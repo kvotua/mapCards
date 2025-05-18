@@ -31,8 +31,8 @@ export const useMapLogic = () => {
   const initialRegion = {
     latitude: 54.70933778858266,
     longitude: 20.508267189176646,
-    latitudeDelta: 2,
-    longitudeDelta: 2,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
   };
 
   useEffect(() => {
